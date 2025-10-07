@@ -72,6 +72,38 @@ return [
             'after_commit' => false,
         ],
 
+        'rabbitmq' => [
+            'driver' => 'rabbitmq',
+            'hosts' => [
+                [
+                    'host' => env('RABBITMQ_HOST', '127.0.0.1'),
+                    'port' => env('RABBITMQ_PORT', 5672),
+                    'user' => env('RABBITMQ_USER', 'guest'),
+                    'password' => env('RABBITMQ_PASSWORD', 'guest'),
+                    'vhost' => env('RABBITMQ_VHOST', '/'),
+                ],
+            ],
+            'options' => [
+                // 'prefetch_count' => 10,
+                'ssl_options' => [
+                    'cafile' => env('RABBITMQ_SSL_CAFILE', null),
+                    'local_cert' => env('RABBITMQ_SSL_LOCALCERT', null),
+                    'local_key' => env('RABBITMQ_SSL_LOCALKEY', null),
+                    'verify_peer' => env('RABBITMQ_SSL_VERIFY_PEER', true),
+                    'passphrase' => env('RABBITMQ_SSL_PASSPHRASE', null),
+                ],
+            ],
+            // Configuración para RabbitMQ Management API
+            'management' => [
+                'host' => env('RABBITMQ_MANAGEMENT_HOST', 'http://localhost:15672'),
+                'user' => env('RABBITMQ_MANAGEMENT_USER', 'guest'),
+                'password' => env('RABBITMQ_MANAGEMENT_PASSWORD', 'guest'),
+            ],
+            // 'queues' => env('RABBITMQ_QUEUES', 'default,santacruz'),
+            //Si se va a usar laravel horizon, poner "horizon"
+            // 'worker' => env('RABBITMQ_WORKER', 'horizon'),
+        ],
+
     ],
 
     /*
