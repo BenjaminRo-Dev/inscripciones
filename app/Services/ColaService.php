@@ -33,7 +33,7 @@ class ColaService
 
         return response()->json([
             'message' => 'Operacion en proceso',
-            'url' => url("api/estado/$uuid"),
+            'url' => url("api/inscripciones/estado/$uuid"),
             'transaction_id' => $uuid,
             'status' => 'procesando'
         ], 202);
@@ -48,7 +48,7 @@ class ColaService
             $uuid = Cache::get("idem:$llaveIdempotencia");
             return response()->json([
                 'message' => 'Operacion ya en proceso',
-                'url' => url("api/estado/$uuid"),
+                'url' => url("api/inscripciones/estado/$uuid"),
                 'transaction_id' => $uuid,
                 'status' => Cache::get("t:$uuid")
             ], 202);
