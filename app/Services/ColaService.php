@@ -20,8 +20,8 @@ class ColaService
     {
         $uuid = Str::uuid()->toString();
 
-        // CrudJob::dispatch($serviceClass, $metodo, $params, $uuid)->onQueue($this->rabbitMQService->getColaCorta());
-        CrudJob::dispatch($serviceClass, $metodo, $params, $uuid);
+        CrudJob::dispatch($serviceClass, $metodo, $params, $uuid)->onQueue($this->rabbitMQService->getColaCorta());
+        // CrudJob::dispatch($serviceClass, $metodo, $params, $uuid);
 
 
         Cache::put("t:$uuid", "procesando", config('cache.tiempo_cache'));

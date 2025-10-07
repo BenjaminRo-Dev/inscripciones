@@ -33,7 +33,7 @@ class InscripcionController extends Controller
             'grupos.*'      => ['integer'],
         ]);
 
-        $this->colaService->encolar(InscripcionService::class, 'guardar', $datos);
+        return $this->colaService->encolar(InscripcionService::class, 'guardar', $datos);
             
     }
 
