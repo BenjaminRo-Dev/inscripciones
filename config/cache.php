@@ -4,6 +4,9 @@ use Illuminate\Support\Str;
 
 return [
 
+    'tiempo_cache' => env('TIEMPO_CACHE', 60), //Tiempo en segundos que se guarda en cache el resultado de la operacion
+    'tiempo_cache_error' => env('TIEMPO_CACHE_ERROR', 300), // tiempo en segundos que se guarda en cache el error de la operacion
+
     /*
     |--------------------------------------------------------------------------
     | Default Cache Store

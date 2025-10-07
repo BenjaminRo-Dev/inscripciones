@@ -99,7 +99,7 @@ return [
                 'user' => env('RABBITMQ_MANAGEMENT_USER', 'guest'),
                 'password' => env('RABBITMQ_MANAGEMENT_PASSWORD', 'guest'),
             ],
-            // 'queues' => env('RABBITMQ_QUEUES', 'default,santacruz'),
+            'queues' => env('RABBITMQ_QUEUES', 'default'),
             //Si se va a usar laravel horizon, poner "horizon"
             // 'worker' => env('RABBITMQ_WORKER', 'horizon'),
         ],
