@@ -11,6 +11,7 @@ WORKDIR /var/www/html
 RUN apk add --no-cache \
     git curl zip unzip bash libpng-dev libjpeg-turbo-dev freetype-dev \
     libzip-dev libxml2-dev oniguruma-dev icu-dev postgresql-dev postgresql-client \
+    $PHPIZE_DEPS \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         pdo_pgsql \
@@ -20,7 +21,9 @@ RUN apk add --no-cache \
         bcmath \
         opcache \
         pcntl \
-    && apk del --no-cache libpng-dev libjpeg-turbo-dev freetype-dev postgresql-dev
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del --no-cache libpng-dev libjpeg-turbo-dev freetype-dev postgresql-dev $PHPIZE_DEPS
 
 # Instalar Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

@@ -36,9 +36,23 @@ services:
       # - postgres
       - redis
       - rabbitmq
-    # command: php artisan queue:listen #nota, esto no funciona, usar supervisord, mientras hacerlo manual
     networks:
       - microservicios-topicos
+
+  # postgres:
+  #   image: postgres:17-alpine
+  #   container_name: postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_DB: ${DB_DATABASE:-laravel}
+  #     POSTGRES_USER: ${DB_USERNAME:-benjamin}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-03091542}
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - microservicios-topicos
 
   redis:
     image: redis:alpine
@@ -47,10 +61,10 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    # healthcheck:
-    #   test: ["CMD", "redis-cli", "ping"]
-    #   retries: 3
-    #   timeout: 5s
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      retries: 3
+      timeout: 5s
     networks:
       - microservicios-topicos
 
@@ -78,14 +92,15 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
-    # healthcheck:
-    #   test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-    #   retries: 3
-    #   timeout: 5s
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      retries: 3
+      timeout: 5s
     networks:
       - microservicios-topicos
 
 volumes:
+  # postgres_data:
   redis_data:
   rabbitmq_data:
 
