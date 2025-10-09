@@ -1,0 +1,1 @@
+sail artisan queue:listen
