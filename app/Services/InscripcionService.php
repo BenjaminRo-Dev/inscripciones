@@ -38,7 +38,11 @@ class InscripcionService
             foreach ($datos['grupos'] as $grupoId) {
                 $grupo = Grupo::findOrFail($grupoId);
                 if ($grupo->cupo <= 0) {
-                    return response()->json(['message' => "El grupo con ID $grupoId no tiene cupos disponibles."], 400);
+                    return [
+                        'success' => false,
+                        'message' => "El grupo con ID $grupoId no tiene cupos disponibles.",
+                        'data' => null
+                    ];
                 }
             }
 
