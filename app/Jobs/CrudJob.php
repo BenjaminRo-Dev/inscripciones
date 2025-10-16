@@ -37,9 +37,9 @@ class CrudJob implements ShouldQueue
         //TODO: Limpiar este codigo
         if (is_array($this->params)) {
             $respuesta = call_user_func_array([$servicio, $this->metodo], $this->params);
-
         } else {
             $respuesta = $servicio->{$this->metodo}();
+            log()->info("USANDO EL 2DO METODO");
         }
 
         // sleep(2); 

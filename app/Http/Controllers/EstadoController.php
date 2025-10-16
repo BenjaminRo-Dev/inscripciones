@@ -13,11 +13,11 @@ class EstadoController extends Controller
         if (!$estado) {
             return response()->json([
                 'Solicitud' => 'Transacción expirada.'
-            ]);
+            ], 404);
         }
 
         return response()->json([
             'Solicitud' => $estado
-        ]);
+        ], $estado['datos']['code'] ?? 200);
     }
 }

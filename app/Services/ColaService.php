@@ -21,6 +21,7 @@ class ColaService
     public function encolar(string $serviceClass, string $metodo, ...$params)
     {
         $uuid = Str::uuid()->toString();
+        $params[0]['uuid'] = $uuid;
 
         CrudJob::dispatch($serviceClass, $metodo, $params, $uuid)->onQueue($this->rabbitMQService->getColaCorta());
 

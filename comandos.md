@@ -1,4 +1,5 @@
 sail artisan queue:listen
+docker exec -it laravel-inscripciones php artisan queue:listen
 
 **Contenedor**
 Ingresar al contenedor:

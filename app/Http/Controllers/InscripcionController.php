@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Grupo;
 use App\Services\ColaService;
 use App\Services\InscripcionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class InscripcionController extends Controller
 {
@@ -34,7 +36,7 @@ class InscripcionController extends Controller
         ]);
 
         return $this->colaService->encolar(InscripcionService::class, 'guardar', $datos);
-            
+        // return $this->service->guardar($datos);
     }
 
     public function show(string $id)
