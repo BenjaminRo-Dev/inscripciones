@@ -33,8 +33,13 @@ class InscripcionController extends Controller
             'fecha'         => ['required', 'date'],
             'grupos'        => ['required', 'array', 'min:1'],
             'grupos.*'      => ['integer'],
+            'parcial'       => ['sometimes', 'boolean'],
         ]);
 
+        if (isset($datos['parcial']) && $datos['parcial'] === true) {
+            unset($datos['parcial']);
+            return $this->colaService->encolar(InscripcionService::class, 'guardarParcial', $datos);
+        }
         return $this->colaService->encolar(InscripcionService::class, 'guardar', $datos);
         // return $this->service->guardar($datos);
     }

@@ -54,22 +54,7 @@ class InscripcionService
                 );
             }
 
-            $inscripcion = Inscripcion::create([
-                'estudiante_id' => $datos['estudiante_id'],
-                'gestion_id'    => $datos['gestion_id'],
-                'fecha'         => $datos['fecha'],
-            ]);
-
-            foreach ($datos['grupos'] as $grupoId) {
-                Grupo::findOrFail($grupoId)->decrement('cupo');
-            }
-
-            foreach ($datos['grupos'] as $grupoId) {
-                DetalleInscripcion::create([
-                    'inscripcion_id' => $inscripcion->id,
-                    'grupo_id'       => $grupoId,
-                ]);
-            }
+            $inscripcion = $this->inscribir($datos);
 
             DB::commit();
 
@@ -79,27 +64,59 @@ class InscripcionService
                 'data' => Inscripcion::with('gestion', 'estudiante', 'detalle')->find($inscripcion->id)
             ];
         } catch (\Throwable $e) {
-            DB::rollBack();
-            log()->error("Error al guardar la inscripción en la transaccion:". $datos['uuid'] ." -  " . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Error al guardar la inscripción: ' . $e->getMessage(),
-                'data' => null,
-                'code' => $e instanceof ChoqueHorarioException ? 409 : 422
-            ];
+            return $this->manejoError($datos, $e);
         }
     }
 
     private function validarCupos(array $gruposIds): bool
     {
         foreach ($gruposIds as $grupoId) {
-            $grupo = Grupo::findOrFail($grupoId);
+            // $grupo = Grupo::findOrFail($grupoId);
+            $grupo = Grupo::where('id', $grupoId)->lockForUpdate()->firstOrFail();
             if ($grupo->cupo <= 0) {
                 return false;
             }
         }
         return true;
     }
+
+    //Realizar la inscripcion de los grupos que si tienen cupos e ingnorar los que no lo tienen
+    public function guardarParcial(array $datos)
+    {
+        try {
+            DB::beginTransaction();
+
+            $resultado = $this->filtrarGruposConCupos($datos['grupos']);
+            $gruposValidos = $resultado['validos'];
+            $gruposSinCupo = $resultado['sin_cupo'];
+
+            if (empty($gruposValidos)) {
+                throw new CupoCeroException("Ninguno de los grupos tiene cupos disponibles.");
+            }
+
+            $datos['grupos'] = $gruposValidos;
+            $inscripcion = $this->inscribir($datos);
+
+            DB::commit();
+
+            foreach ($gruposSinCupo as $grupoId) {
+                log()->warning("Grupo sin cupo (no inscrito) en transacción {$datos['uuid']}: Grupo ID {$grupoId}");
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Inscripción parcial completada.',
+                'data' => [
+                    'inscripcion' => Inscripcion::with('gestion', 'estudiante', 'detalle')->find($inscripcion->id),
+                    'grupos_inscritos' => $gruposValidos,
+                    'grupos_sin_cupo' => $gruposSinCupo,
+                ],
+            ];
+        } catch (\Throwable $e) {
+            return $this->manejoError($datos, $e);
+        }
+    }
+
 
     private function validarChoqueHorarios(array $gruposIds): array
     {
@@ -135,6 +152,63 @@ class InscripcionService
         }
 
         return $gruposEnChoque;
+    }
+
+    private function inscribir($datos): Inscripcion
+    {
+        $inscripcion = Inscripcion::create([
+            'estudiante_id' => $datos['estudiante_id'],
+            'gestion_id'    => $datos['gestion_id'],
+            'fecha'         => $datos['fecha'],
+        ]);
+
+        foreach ($datos['grupos'] as $grupoId) {
+            Grupo::findOrFail($grupoId)->decrement('cupo');
+        }
+
+        foreach ($datos['grupos'] as $grupoId) {
+            DetalleInscripcion::create([
+                'inscripcion_id' => $inscripcion->id,
+                'grupo_id'       => $grupoId,
+            ]);
+        }
+        return $inscripcion;
+    }
+
+    private function filtrarGruposConCupos(array $gruposIds): array
+    {
+        $gruposValidos = [];
+        $gruposSinCupo = [];
+
+        foreach ($gruposIds as $grupoId) {
+            $grupo = Grupo::where('id', $grupoId)->lockForUpdate()->firstOrFail();
+            if ($grupo->cupo > 0) {
+                $gruposValidos[] = $grupoId;
+            } else {
+                $gruposSinCupo[] = $grupoId;
+            }
+        }
+
+        return [
+            'validos' => $gruposValidos,
+            'sin_cupo' => $gruposSinCupo,
+        ];
+    }
+
+    private function manejoError(array $datos, \Throwable $e)
+    {
+        if (DB::transactionLevel() > 0) {
+            DB::rollBack();
+        }
+
+        log()->error("Error al guardar inscripción en transacción: {$datos['uuid']} - {$e->getMessage()}");
+
+        return [
+            'success' => false,
+            'message' => 'Error al guardar la inscripción: ' . $e->getMessage(),
+            'data' => null,
+            'code' => $e instanceof CupoCeroException ? 409 : 422,
+        ];
     }
 
 

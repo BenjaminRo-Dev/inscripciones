@@ -17,6 +17,7 @@ Route::get('/user', function (Request $request) {
 
 
 Route::apiResource('inscripciones', InscripcionController::class);
+Route::post('inscripcion-parcial', [InscripcionController::class, 'guardarParcial']);
 
 
 Route::get('estado/{uuid}', [EstadoController::class, 'consultarEstado']);
