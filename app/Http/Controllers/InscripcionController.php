@@ -46,7 +46,8 @@ class InscripcionController extends Controller
 
     public function show(string $id)
     {
-        return $this->colaService->encolar(InscripcionService::class, 'mostrar', $id);
+        $datos['id'] = $id;
+        return $this->colaService->encolar(InscripcionService::class, 'mostrar', $datos);
     }
 
     public function update(Request $request, string $id)
@@ -64,6 +65,7 @@ class InscripcionController extends Controller
 
     public function destroy(string $id)
     {
-        return $this->colaService->encolar(InscripcionService::class, 'eliminar', $id);
+        $datos['id'] = $id;
+        return $this->colaService->encolar(InscripcionService::class, 'eliminar', $datos);
     }
 }

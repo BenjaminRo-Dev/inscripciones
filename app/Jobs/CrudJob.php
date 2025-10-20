@@ -33,15 +33,7 @@ class CrudJob implements ShouldQueue
     public function handle(): void
     {
         $servicio = app()->make($this->serviceClass);
-
-        //TODO: Limpiar este codigo
-        if (is_array($this->params)) {
-            $respuesta = call_user_func_array([$servicio, $this->metodo], $this->params);
-        } else {
-            $respuesta = $servicio->{$this->metodo}();
-            log()->info("USANDO EL 2DO METODO");
-        }
-
+        $respuesta = call_user_func_array([$servicio, $this->metodo], $this->params);
         // sleep(2); 
 
         Cache::put("t:$this->uuid", [

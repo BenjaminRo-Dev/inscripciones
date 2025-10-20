@@ -14,9 +14,10 @@ use function Illuminate\Log\log;
 
 class InscripcionService
 {
-    public function mostrar($id)
+    public function mostrar($datos)
     {
-        return Inscripcion::with('detalle')->findOrFail($id);
+        // return $datos;
+        return Inscripcion::with('detalle')->findOrFail($datos['id']);
         // return Inscripcion::with([
         //     'gestion',
         //     'estudiante',
@@ -214,6 +215,7 @@ class InscripcionService
 
     public function actualizar(array $datos, $id)
     {
+        return $datos;
         return DB::transaction(function () use ($datos, $id) {
             $inscripcion = Inscripcion::findOrFail($id);
             $inscripcion->update([
@@ -237,13 +239,19 @@ class InscripcionService
         });
     }
 
-    public function eliminar($id)
+    public function eliminar($datos)
     {
+        // return $datos;
+        $id = $datos['id'];
         return DB::transaction(function () use ($id) {
             $inscripcion = Inscripcion::findOrFail($id);
             $inscripcion->detalle()->delete();
             $inscripcion->delete();
-            return response()->json(['message' => 'Inscripción eliminada correctamente.'], 200);
+            return [
+                'success' => true,
+                'message' => 'Inscripción eliminada correctamente.',
+                'data' => 'id eliminado: ' . $id,
+            ];
         });
     }
 }

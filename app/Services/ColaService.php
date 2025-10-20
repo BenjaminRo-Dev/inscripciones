@@ -23,6 +23,8 @@ class ColaService
         $uuid = Str::uuid()->toString();
         $params[0]['uuid'] = $uuid;
 
+        // return $params;
+
         CrudJob::dispatch($serviceClass, $metodo, $params, $uuid)->onQueue($this->rabbitMQService->getColaCorta());
 
         Cache::put("t:$uuid", [
