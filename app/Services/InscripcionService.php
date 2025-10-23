@@ -14,6 +14,13 @@ use function Illuminate\Log\log;
 
 class InscripcionService
 {
+    public function __construct(
+        protected Repositories\InscripcionRepository $repository,
+        protected Validators\CupoValidator $cupoValidator,
+        protected Validators\HorarioValidator $horarioValidator,
+    ) {
+    }
+
     public function mostrar($datos)
     {
         // return $datos;
@@ -37,16 +44,17 @@ class InscripcionService
         // return Inscripcion::with('gestion', 'estudiante', 'detalle')->get();
     }
 
+    //Todos o nada
     public function guardar(array $datos)
     {
         try {
             DB::beginTransaction();
 
-            if (!$this->validarCupos($datos['grupos'])) {
+            if (!$this->cupoValidator->validarCupos($datos['grupos'])) {
                 throw new CupoCeroException("Uno o más grupos no tienen cupos disponibles.");
             }
 
-            $choques = $this->validarChoqueHorarios($datos['grupos']);
+            $choques = $this->horarioValidator->validarChoqueHorarios($datos['grupos']);
 
             if (!empty($choques)) {
                 throw new ChoqueHorarioException(
@@ -55,7 +63,7 @@ class InscripcionService
                 );
             }
 
-            $inscripcion = $this->inscribir($datos);
+            $inscripcion = $this->repository->inscribir($datos);
 
             DB::commit();
 
@@ -69,25 +77,13 @@ class InscripcionService
         }
     }
 
-    private function validarCupos(array $gruposIds): bool
-    {
-        foreach ($gruposIds as $grupoId) {
-            // $grupo = Grupo::findOrFail($grupoId);
-            $grupo = Grupo::where('id', $grupoId)->lockForUpdate()->firstOrFail();
-            if ($grupo->cupo <= 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     //Realizar la inscripcion de los grupos que si tienen cupos e ingnorar los que no lo tienen
     public function guardarParcial(array $datos)
     {
         try {
             DB::beginTransaction();
 
-            $resultado = $this->filtrarGruposConCupos($datos['grupos']);
+            $resultado = $this->repository->filtrarGruposConCupos($datos['grupos']);
             $gruposValidos = $resultado['validos'];
             $gruposSinCupo = $resultado['sin_cupo'];
 
@@ -96,7 +92,7 @@ class InscripcionService
             }
 
             $datos['grupos'] = $gruposValidos;
-            $inscripcion = $this->inscribir($datos);
+            $inscripcion = $this->repository->inscribir($datos);
 
             DB::commit();
 
@@ -116,84 +112,6 @@ class InscripcionService
         } catch (\Throwable $e) {
             return $this->manejoError($datos, $e);
         }
-    }
-
-
-    private function validarChoqueHorarios(array $gruposIds): array
-    {
-        $gruposHorarios = [];
-
-        foreach ($gruposIds as $grupoId) {
-            $response = Http::get("http://grupos-service:3001/api/horario/grupo/{$grupoId}");
-            $gruposHorarios[$grupoId] = $response->json();
-        }
-
-        $gruposEnChoque = [];
-
-        foreach ($gruposHorarios as $grupoIdA => $horariosA) {
-            foreach ($gruposHorarios as $grupoIdB => $horariosB) {
-                if ($grupoIdA >= $grupoIdB) continue;
-
-                foreach ($horariosA as $hA) {
-                    foreach ($horariosB as $hB) {
-                        if ($hA['dia'] === $hB['dia']) {
-                            $inicioA = strtotime($hA['horaInicio']);
-                            $finA    = strtotime($hA['horaFin']);
-                            $inicioB = strtotime($hB['horaInicio']);
-                            $finB    = strtotime($hB['horaFin']);
-
-                            if ($inicioA < $finB && $inicioB < $finA) {
-                                $gruposEnChoque[] = [$grupoIdA, $grupoIdB];
-                                break 3;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $gruposEnChoque;
-    }
-
-    private function inscribir($datos): Inscripcion
-    {
-        $inscripcion = Inscripcion::create([
-            'estudiante_id' => $datos['estudiante_id'],
-            'gestion_id'    => $datos['gestion_id'],
-            'fecha'         => $datos['fecha'],
-        ]);
-
-        foreach ($datos['grupos'] as $grupoId) {
-            Grupo::findOrFail($grupoId)->decrement('cupo');
-        }
-
-        foreach ($datos['grupos'] as $grupoId) {
-            DetalleInscripcion::create([
-                'inscripcion_id' => $inscripcion->id,
-                'grupo_id'       => $grupoId,
-            ]);
-        }
-        return $inscripcion;
-    }
-
-    private function filtrarGruposConCupos(array $gruposIds): array
-    {
-        $gruposValidos = [];
-        $gruposSinCupo = [];
-
-        foreach ($gruposIds as $grupoId) {
-            $grupo = Grupo::where('id', $grupoId)->lockForUpdate()->firstOrFail();
-            if ($grupo->cupo > 0) {
-                $gruposValidos[] = $grupoId;
-            } else {
-                $gruposSinCupo[] = $grupoId;
-            }
-        }
-
-        return [
-            'validos' => $gruposValidos,
-            'sin_cupo' => $gruposSinCupo,
-        ];
     }
 
     private function manejoError(array $datos, \Throwable $e)
