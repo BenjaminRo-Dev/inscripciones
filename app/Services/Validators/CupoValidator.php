@@ -2,6 +2,7 @@
 
 namespace App\Services\Validators;
 
+use App\Exceptions\CupoCeroException;
 use App\Models\Grupo;
 use Illuminate\Support\Facades\Http;
 
@@ -13,7 +14,8 @@ class CupoValidator
             // $grupo = Grupo::findOrFail($grupoId);
             $grupo = Grupo::where('id', $grupoId)->lockForUpdate()->firstOrFail();
             if ($grupo->cupo <= 0) {
-                return false;
+                // return false;
+                throw new CupoCeroException("Uno o más grupos no tienen cupos disponibles.");
             }
         }
         return true;

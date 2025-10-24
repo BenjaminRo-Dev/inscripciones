@@ -1,5 +1,6 @@
 sail artisan queue:listen
 docker exec -it laravel-inscripciones php artisan queue:listen
+docker exec -it laravel-inscripciones php artisan test --filter=CupoTest
 
 **Contenedor**
 Ingresar al contenedor:

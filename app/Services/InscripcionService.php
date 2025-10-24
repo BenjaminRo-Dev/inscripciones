@@ -50,9 +50,11 @@ class InscripcionService
         try {
             DB::beginTransaction();
 
-            if (!$this->cupoValidator->validarCupos($datos['grupos'])) {
-                throw new CupoCeroException("Uno o más grupos no tienen cupos disponibles.");
-            }
+            // if (!$this->cupoValidator->validarCupos($datos['grupos'])) {
+            //     throw new CupoCeroException("Uno o más grupos no tienen cupos disponibles.");
+            // }
+            
+            $this->cupoValidator->validarCupos($datos['grupos']);
 
             $choques = $this->horarioValidator->validarChoqueHorarios($datos['grupos']);
 
