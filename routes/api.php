@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\ColaController;
 use App\Http\Controllers\EstadoController;
+use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\InscripcionController;
+use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\RabbitMQController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,3 +35,9 @@ Route::post('colas/eliminar', [ColaController::class, 'eliminarCola']);
 Route::get('/rabbitmq/info-colas', [RabbitMQController::class, 'getInfoColas']);
 Route::get('/rabbitmq/longitudes-colas', [RabbitMQController::class, 'getLongitudesColas']);
 Route::post('/rabbitmq/crear-cola', [RabbitMQController::class, 'crearCola']);
+
+//Sincrono
+Route::get('/modulos', [ModuloController::class, 'index']);
+Route::get('/modulos/{id}', [ModuloController::class, 'show']);
+
+Route::get('/grupos', [GrupoController::class, 'index']);

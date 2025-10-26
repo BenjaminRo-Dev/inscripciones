@@ -15,9 +15,9 @@ class Gestion extends Model
         return $this->hasMany(Inscripcion::class, 'gestion_id');
     }
 
-    // // Una gestión tiene muchos grupos
-    // public function grupos()
-    // {
-    //     return $this->hasMany(Grupo::class, 'gestion_id');
-    // }
+    // Una gestión tiene muchos grupos
+    public function grupos()
+    {
+        return $this->hasMany(Grupo::class, 'gestion_id');
+    }
 }
