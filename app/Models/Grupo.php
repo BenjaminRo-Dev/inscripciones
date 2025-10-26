@@ -25,4 +25,15 @@ class Grupo extends Model
     {
         return $this->hasMany(DetalleInscripcion::class);
     }
+
+    // Un grupo pertenece a una materia
+    public function materia()
+    {
+        return $this->belongsTo(Materia::class, 'materia_id');
+    }
+
+    public function grupoEstudiantes()
+    {
+        return $this->hasMany(GrupoEstudiante::class, 'grupo_id');
+    }
 }

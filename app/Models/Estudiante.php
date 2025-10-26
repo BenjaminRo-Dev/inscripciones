@@ -21,10 +21,10 @@ class Estudiante extends Model
         return $this->hasMany(Inscripcion::class, 'estudiante_id');
     }
 
-    // public function grupoEstudiantes()
-    // {
-    //     return $this->hasMany(GrupoEstudiante::class, 'estudiante_id');
-    // }
+    public function grupoEstudiantes()
+    {
+        return $this->hasMany(GrupoEstudiante::class, 'estudiante_id');
+    }
 
 
     // public function user()
