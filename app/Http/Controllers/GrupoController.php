@@ -22,6 +22,15 @@ class GrupoController extends Controller
         return response()->json($grupo);
     }
 
+    public function gruposMateria($materiaId)
+    {
+        $grupos = Grupo::with('materia', 'docente', 'horarios', 'horarios.aula')
+            ->where('materia_id', $materiaId)
+            ->get();
+
+        return response()->json($grupos);
+    }
+
     public function historialEstudiante($estudianteId)
     {
         $grupoEstudiantes = GrupoEstudiante::with('grupo.materia')

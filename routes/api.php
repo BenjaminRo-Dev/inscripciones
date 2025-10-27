@@ -42,6 +42,9 @@ Route::get('/modulos/{id}', [ModuloController::class, 'show']);
 
 Route::get('/grupos', [GrupoController::class, 'index']);
 Route::get('/grupos/{id}', [GrupoController::class, 'show']);
+Route::get('/grupos/materia/{materiaId}', [GrupoController::class, 'gruposMateria']);
+
+
 Route::get('/grupos/historial/{estudianteId}', [GrupoController::class, 'historialEstudiante']);
 Route::get('/grupos/materias-pendientes/{estudianteId}', [GrupoController::class, 'materiasPendientes']);
 Route::get('/grupos/materias-inscribibles/{estudianteId}', [GrupoController::class, 'materiasInscribibles']);
