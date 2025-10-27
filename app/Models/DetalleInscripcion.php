@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DetalleInscripcion extends Model
 {
+    use HasFactory;
+    
     protected $table = 'detalle_inscripciones';
     protected $fillable = ['inscripcion_id', 'grupo_id'];
 

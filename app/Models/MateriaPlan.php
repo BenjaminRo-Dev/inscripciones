@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MateriaPlan extends Model
 {
+    use HasFactory;
+    
     //Materia plan es el modelo que representa la relación entre las materias y los planes de estudio
 
     protected $table = 'materia_planes';
