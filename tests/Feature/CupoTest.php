@@ -16,22 +16,22 @@ test('valida cupos cuando hay cupos disponibles', function () {
     expect($result)->toBeTrue();
 });
 
-// test('no valida cupos cuando no hay cupos disponibles', function () {
-//     $grupo1 = Grupo::factory()->create(['cupo' => 0]);
-//     $grupo2 = Grupo::factory()->create(['cupo' => 5]);
+test('no valida cupos cuando no hay cupos disponibles', function () {
+    $grupo1 = Grupo::factory()->create(['cupo' => 0]);
+    $grupo2 = Grupo::factory()->create(['cupo' => 5]);
 
-//     $validator = new CupoValidator();
-//     $result = $validator->validarCupos([$grupo1->id, $grupo2->id]);
+    $validator = new CupoValidator();
+    $result = $validator->validarCupos([$grupo1->id, $grupo2->id]);
 
-//     expect($result)->toBeFalse();
-// });
+    expect($result)->toBeFalse();
+});
 
-// test('valida cupos cuando hay exactamente el último cupo disponible', function () {
-//     $grupo1 = Grupo::factory()->create(['cupo' => 1]);
-//     $grupo2 = Grupo::factory()->create(['cupo' => 1]);
+test('valida cupos cuando hay exactamente el último cupo disponible', function () {
+    $grupo1 = Grupo::factory()->create(['cupo' => 1]);
+    $grupo2 = Grupo::factory()->create(['cupo' => 1]);
 
-//     $validator = new CupoValidator();
-//     $result = $validator->validarCupos([$grupo1->id, $grupo2->id]);
+    $validator = new CupoValidator();
+    $result = $validator->validarCupos([$grupo1->id, $grupo2->id]);
 
-//     expect($result)->toBeTrue();
-// });
+    expect($result)->toBeTrue();
+});
