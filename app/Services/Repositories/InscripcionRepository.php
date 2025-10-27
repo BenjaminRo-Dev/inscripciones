@@ -5,6 +5,10 @@ namespace App\Services\Repositories;
 use App\Models\Inscripcion;
 use App\Models\DetalleInscripcion;
 use App\Models\Grupo;
+use App\Services\PerfilService;
+use Illuminate\Support\Facades\Http;
+
+use function Illuminate\Log\log;
 
 class InscripcionRepository
 {
@@ -45,8 +49,18 @@ class InscripcionRepository
 
     private function obtenerConRelaciones(int $id): Inscripcion
     {
-        return Inscripcion::with('gestion', 'estudiante', 'detalle')->findOrFail($id);
+        $inscripcion = Inscripcion::with(['gestion', 'detalle'])->findOrFail($id);
+
+        $perfilService = new PerfilService();
+        $estudiante = $perfilService->obtenerEstudiante($inscripcion->estudiante_id);
+
+        if ($estudiante) {
+            $inscripcion->estudiante = $estudiante;
+        }
+
+        return $inscripcion;
     }
+
 
     public function filtrarGruposConCupos(array $gruposIds): array
     {

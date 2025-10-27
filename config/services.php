@@ -2,6 +2,10 @@
 
 return [
 
+    'perfil' => [
+        'base_url' => env('PERFIL_SERVICE_URL', 'http://perfil-service:3002'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

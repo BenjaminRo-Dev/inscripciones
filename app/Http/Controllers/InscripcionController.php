@@ -27,9 +27,6 @@ class InscripcionController extends Controller
 
     public function store(Request $request)
     {
-        // return response()->json([
-        //     "asd" => "asd"
-        // ]);
         $datos = $request->validate([
             'estudiante_id' => ['required', 'integer'],
             'gestion_id'    => ['required', 'integer'],

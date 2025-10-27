@@ -23,25 +23,12 @@ class InscripcionService
 
     public function mostrar($datos)
     {
-        // return $datos;
         return Inscripcion::with('detalle')->findOrFail($datos['id']);
-        // return Inscripcion::with([
-        //     'gestion',
-        //     'estudiante',
-        //     'detalle',
-        //     'detalle.grupo',
-        //     'detalle.grupo.materia',
-        //     'detalle.grupo.docente',
-        //     'detalle.grupo.horarios',
-        //     'detalle.grupo.horarios.modulo',
-        //     'detalle.grupo.horarios.aula',
-        // ])->findOrFail($id);
     }
 
     public function mostrarTodos()
     {
         return Inscripcion::all();
-        // return Inscripcion::with('gestion', 'estudiante', 'detalle')->get();
     }
 
     //Todos o nada

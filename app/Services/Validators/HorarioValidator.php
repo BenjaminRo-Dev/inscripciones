@@ -2,6 +2,7 @@
 
 namespace App\Services\Validators;
 
+use App\Models\Horario;
 use Illuminate\Support\Facades\Http;
 
 class HorarioValidator
@@ -16,8 +17,12 @@ class HorarioValidator
     {
         $gruposHorarios = [];
         foreach ($gruposIds as $grupoId) {
-            $response = Http::get("http://grupos-service:3001/api/horario/grupo/{$grupoId}");
-            $gruposHorarios[$grupoId] = $response->json();
+            $response = Horario::where('grupo_id', $grupoId)->get();
+            $gruposHorarios[$grupoId] = $response->map(fn($h) => [
+                'dia'        => $h->dia,
+                'horaInicio' => $h->hora_inicio,
+                'horaFin'    => $h->hora_fin,
+            ])->toArray();
         }
         return $gruposHorarios;
     }
