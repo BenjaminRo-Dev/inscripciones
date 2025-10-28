@@ -30,4 +30,23 @@ class PerfilService
 
         return null;
     }
+
+    public function obtenerDocente(int $id): ?array
+    {
+        try {
+            $response = Http::timeout(2)->get("{$this->baseUrl}/api/docentes/{$id}");
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            Log::warning("PerfilService: respuesta no exitosa ({$response->status()}) al obtener docente {$id}");
+        } catch (\Throwable $e) {
+            Log::warning("PerfilService: error al obtener docente {$id} - {$e->getMessage()}");
+        }
+
+        return null;
+    }
+
+
 }

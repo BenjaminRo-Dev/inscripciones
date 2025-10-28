@@ -5,6 +5,9 @@ return [
     'perfil' => [
         'base_url' => env('PERFIL_SERVICE_URL', 'http://perfil-service:3002'),
     ],
+    'materia' => [
+        'base_url' => env('MATERIA_SERVICE_URL', 'http://materias-service:3000'),
+    ],
 
     /*
     |--------------------------------------------------------------------------

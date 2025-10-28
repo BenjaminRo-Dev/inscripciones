@@ -6,6 +6,8 @@ use App\Models\Estudiante;
 use App\Models\Grupo;
 use App\Models\GrupoEstudiante;
 use App\Models\Materia;
+use App\Services\MateriaService;
+use App\Services\PerfilService;
 use Illuminate\Http\Request;
 
 class GrupoController extends Controller
@@ -24,9 +26,31 @@ class GrupoController extends Controller
 
     public function gruposMateria($materiaId)
     {
-        $grupos = Grupo::with('materia', 'docente', 'horarios', 'horarios.aula')
+        // $grupos = Grupo::with('materia', 'docente', 'horarios', 'horarios.aula')
+            // ->where('materia_id', $materiaId)
+            // ->get();
+
+        $grupos = Grupo::with('horarios', 'horarios.aula')
             ->where('materia_id', $materiaId)
             ->get();
+
+
+        $materiaService = new MateriaService();
+        $materia = $materiaService->obtenerMateria($materiaId);
+
+        if($materia){
+            $grupos->each(function($grupo) use ($materia) {
+                $grupo->materia = $materia;
+            });
+        }
+
+        $perfilService = new PerfilService();
+        foreach ($grupos as $grupo) {
+            $docente = $perfilService->obtenerDocente($grupo->docente_id);
+            if ($docente) {
+                $grupo->docente = $docente;
+            }
+        }
 
         return response()->json($grupos);
     }
