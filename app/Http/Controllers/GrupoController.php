@@ -55,6 +55,46 @@ class GrupoController extends Controller
         return response()->json($grupos);
     }
 
+    public function getMateriasInfoByEstudiante($estudianteId)
+    {
+        // Obtener inscripciones del estudiante
+        $inscripciones = GrupoEstudiante::where('estudiante_id', $estudianteId)->get();
+
+        if ($inscripciones->isEmpty()) {
+            return response()->json([
+                'materiasInscritas' => [],
+                'materiasAprobadas' => []
+            ]);
+        }
+
+        // Obtener grupos con sus materias
+        $gruposIds = $inscripciones->pluck('grupo_id')->toArray();
+        $grupos = Grupo::whereIn('id', $gruposIds)->get();
+        $grupoToMateria = $grupos->pluck('materia_id', 'id');
+
+        $materiasInscritas = collect();
+        $materiasAprobadas = collect();
+
+        foreach ($inscripciones as $inscripcion) {
+            $materiaId = $grupoToMateria->get($inscripcion->grupo_id);
+            if (!$materiaId) {
+                continue;
+            }
+
+            $materiasInscritas->push($materiaId);
+
+            if ($inscripcion->nota !== null && $inscripcion->nota >= 51) {
+                $materiasAprobadas->push($materiaId);
+            }
+        }
+
+        return response()->json([
+            'materiasInscritas' => $materiasInscritas->unique()->values()->toArray(),
+            'materiasAprobadas' => $materiasAprobadas->unique()->values()->toArray()
+        ]);
+    }
+
+
     public function historialEstudiante($estudianteId)
     {
         $grupoEstudiantes = GrupoEstudiante::with('grupo.materia')

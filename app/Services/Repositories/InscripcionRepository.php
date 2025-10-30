@@ -5,6 +5,7 @@ namespace App\Services\Repositories;
 use App\Models\Inscripcion;
 use App\Models\DetalleInscripcion;
 use App\Models\Grupo;
+use App\Models\GrupoEstudiante;
 use App\Services\PerfilService;
 use Illuminate\Support\Facades\Http;
 
@@ -17,6 +18,7 @@ class InscripcionRepository
         $inscripcion = $this->crear($datos);
         $this->agregarDetalles($inscripcion, $datos['grupos']);
         $this->decrementarCupos($datos['grupos']);
+        $this->agregarHistorial($inscripcion, $datos['grupos']);
 
         return $this->obtenerConRelaciones($inscripcion->id);
     }
@@ -44,6 +46,18 @@ class InscripcionRepository
     {
         foreach ($gruposIds as $grupoId) {
             Grupo::findOrFail($grupoId)->decrement('cupo');
+        }
+    }
+
+    private function agregarHistorial($inscripcion, $gruposIds): void
+    {
+        foreach ($gruposIds as $grupoId) {
+            GrupoEstudiante::create([
+                'grupo_id' => $grupoId,
+                'estudiante_id' => $inscripcion->estudiante_id,
+                'nota' => null,
+                'creditos' => 5,
+            ]);
         }
     }
 

@@ -41,6 +41,7 @@ Route::get('/modulos', [ModuloController::class, 'index']);
 Route::get('/modulos/{id}', [ModuloController::class, 'show']);
 
 Route::get('/grupos', [GrupoController::class, 'index']);
+Route::get('/grupos/estudiante/{estudianteId}/materias-info', [GrupoController::class, 'getMateriasInfoByEstudiante']);
 Route::get('/grupos/{id}', [GrupoController::class, 'show']);
 Route::get('/grupos/materia/{materiaId}', [GrupoController::class, 'gruposMateria']);
 
